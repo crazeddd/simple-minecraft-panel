@@ -9,7 +9,7 @@ function Panel() {
       <Nav />
       <main>
         <NavTop />
-        <Containers />
+        <Containers/>
         <Footer />
       </main>
     </>

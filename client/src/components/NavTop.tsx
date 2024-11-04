@@ -20,6 +20,7 @@ function NavTop() {
       }
     } catch {
       setApiStatus(false);
+      console.error("Heath check failed, is the api offline?");
     }
   };
 
@@ -33,7 +34,7 @@ function NavTop() {
     <nav className="nav top row">
       <h5 className="center">
         <span className="gradient-text">REKCOD</span>
-        <small className="muted">.pannel</small>
+        <small className="muted">.panel</small>
       </h5>
       <button className="row secondary center">
         <p className="muted">

@@ -82,13 +82,11 @@ export const buildContainer = async (req: Request, res: Response) => {
   console.log(containerConfig);
 
   docker.createContainer(containerConfig, (error: string, container: any) => {
-    //Attempts to create container
     if (error) {
       res.status(500).json(`Failed to create container ${error}`);
       console.error(`Error creating container: ${error}`);
     } else {
       container.start((error: string) => {
-        //After successfully creating container attempts to start container
         if (error) {
           console.error("Error starting container: ", error);
         } else {

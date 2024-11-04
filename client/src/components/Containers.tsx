@@ -1,8 +1,10 @@
-import { containers, changeState } from "../utils/handleContainers";
+import { handleContainers } from "../utils/handleContainers";
 
 import "../index.css";
 
 function Containers() {
+  const { containers, changeState } = handleContainers();
+
   // Play svg
   const play = (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
@@ -49,7 +51,7 @@ function Containers() {
         {containers.length == 0 && (
           <div className="server widget secondary row">
             <p className="muted">
-              Its looking a bit empty in here, why not create a container?
+              Its looking a bit empty in here, why not create a server?
             </p>
           </div>
         )}

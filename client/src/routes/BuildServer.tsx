@@ -4,14 +4,11 @@ import { useForm } from "../utils/useForm";
 import Nav from "../components/Nav";
 import NavTop from "../components/NavTop";
 import Footer from "../components/Footer";
-import { version } from "react";
 
 const apiHost = import.meta.env.VITE_API_HOST;
 
-const fields = { name: "", version: "", port: "", host_port: "", protocal: "",env: "" };
-const { form, handleChange } = useForm();
-
 function BuildServer() {
+  const { form, handleChange } = useForm();
   let navigate = useNavigate();
 
   const sumbitForm = async (e: any) => {
@@ -34,6 +31,7 @@ function BuildServer() {
           navigate("/");
         }
       });
+    console.log(form);
   };
 
   return (
