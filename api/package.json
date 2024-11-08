@@ -17,7 +17,8 @@
         "fs": "^0.0.1-security",
         "http-errors": "~1.6.3",
         "morgan": "~1.9.1",
-        "tsx": "^4.19.1"
+        "tsx": "^4.19.1",
+        "ws": "^8.18.0"
     },
     "devDependencies": {
         "@types/cookie-parser": "^1.4.7",
@@ -26,6 +27,7 @@
         "@types/express": "^5.0.0",
         "@types/morgan": "^1.9.9",
         "@types/node": "^20.12.12",
+        "@types/ws": "^8.5.13",
         "typescript": "^5.4.5"
     }
 }

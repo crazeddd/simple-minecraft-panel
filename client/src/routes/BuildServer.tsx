@@ -42,7 +42,7 @@ function BuildServer() {
         <form className="widget secondary column" onSubmit={sumbitForm}>
           <h5>New Server</h5>
           <br />
-          <div className="row">
+          <div className="row wrap">
             <input
               placeholder="Name"
               name="name"
@@ -50,18 +50,30 @@ function BuildServer() {
               onChange={handleChange}
             />
             <input
-              placeholder="Name"
-              name="name"
-              value={form.name || ""}
+              name="version"
+              placeholder="Version"
+              value={form.version || ""}
               onChange={handleChange}
-            />
-          </div>
-          <br />
-          <div className="row">
+              list="versions"/>
+              <datalist id="versions">
+              <option value="1.20.4"></option>
+              <option value="1.20.1"></option>
+              <option value="1.20.0"></option>
+              <option value="1.19.2"></option>
+              <option value="1.18.1"></option>
+              <option value="1.16.5"></option>
+              <option value="1.20.4"></option>
+              <option value="1.20.1"></option>
+              <option value="1.20.0"></option>
+              <option value="1.19.2"></option>
+              <option value="1.18.1"></option>
+              <option value="1.16.5"></option>
+            </datalist>
+            <img className="server-icon" src="e.png"></img>
             <input
-              placeholder="Port"
-              name="port"
-              value={form.port || ""}
+              placeholder="Platform"
+              name="platform"
+              value={form.platform || ""}
               onChange={handleChange}
             />
             <input

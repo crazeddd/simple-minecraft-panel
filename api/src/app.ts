@@ -16,14 +16,14 @@ app.use(cookieParser());
 app.use(express.static("public")); //Serve static files
 
 const corsConfig = {
-  origin: "http://localhost:3000",
+  origin: "https://glorious-cod-6wj4pj674992j55-3000.app.github.dev",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 };
 app.use(cors(corsConfig));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/docker", containerRouter);
+app.use("/container", containerRouter);
 
 export default app;
 

@@ -4,9 +4,11 @@
  * Module dependencies.
  */
 
-const app = require("../src/app.js");
-const debug = require("debug")("express-project:server");
-const http = require("http");
+import app from "../src/app";
+import debug from "debug";
+import { createServer } from "http";
+
+debug("express-project:server");
 
 /**
  * Get port from environment and store in Express.
@@ -19,7 +21,7 @@ app.set("port", port);
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+const server = createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.

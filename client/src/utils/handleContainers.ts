@@ -1,14 +1,8 @@
-import { useState } from "react";
-
-//const ws = new WebSocket("ws://localhost:8080");
-
 const apiHost = import.meta.env.VITE_API_HOST;
 
 const handleContainers = () => {
-  const [containers, appendContainers] = useState([]);
-
   const updateContainers = (type: string, data: { id: any }) => {
-    let url = `${apiHost}/docker/${type}`;
+    let url = `${apiHost}/container/${type}`;
     fetch(url, {
       method: "POST",
       headers: {
@@ -17,16 +11,11 @@ const handleContainers = () => {
       body: JSON.stringify(data),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data), appendContainers(data))
+      .then((data) => console.log(data))
       .catch((error) => console.error("Error:", error));
   };
 
-  /*ws.onmessage = (e) => {
-  appendContainers(e.data);
-  console.log(e.data);
-};*/
-
-  const changeState = async (self: any) => {
+  /*const changeState = async (self: any) => {
     let containerId = self.currentTarget.id;
     let container = containers.find(
       (container: any) => container.id === containerId
@@ -36,9 +25,10 @@ const handleContainers = () => {
 
     let command = container.state === "running" ? "stop" : "start";
     updateContainers(command, containerId);
-  };
+  };*/
 
-  return { containers, changeState };
+
+  //return { changeState };
 };
 
 export { handleContainers };

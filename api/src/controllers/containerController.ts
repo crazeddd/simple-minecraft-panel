@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Docker from "dockerode";
 
+import wss from "../websocket/containerWebsocket";
+
 var docker = new Docker();
 
 export const stopContainer = async (req: Request, res: Response) => {
@@ -32,15 +34,13 @@ export const startContainer = async (req: Request, res: Response) => {
   });
 };
 
-export const refreshContainers = async (req: Request, res: Response) => {
+export const getContainers = async () => {
   let containers: any[] = [];
   try {
-    const containerList = await docker.listContainers({ all: true }); //Grabs a list of all running containers
+    const containerList = await docker.listContainers({ all: true });
 
     for (const containerInfo of containerList) {
-      //For each container found
       let container = {
-        //Gets container id, image, names, and state
         id: containerInfo.Id,
         image: containerInfo.Image,
         names: containerInfo.Names,
@@ -49,12 +49,25 @@ export const refreshContainers = async (req: Request, res: Response) => {
 
       containers.push(container);
     }
-    res.json(containers);
+    console.log(containers);
+    return containers;
   } catch (err) {
-    console.error("Error processing containers:", err);
-    res.status(500).json("Error processing containers");
+    return console.error("Error processing containers:", err);
   }
-};
+}
+
+wss.on("connection", (ws: any) => {
+  console.log("Established connection");
+  ws.send("Sucessfully connected to socket");
+  const sendLoop = () => {
+    wss.clients.forEach(async (client: any) => {
+      let data = await getContainers();
+      client.send(JSON.stringify(data));
+    })
+  }
+  setInterval(sendLoop, 1000);
+})
+
 
 export const buildContainer = async (req: Request, res: Response) => {
   for (let input in req.body) {
@@ -63,7 +76,6 @@ export const buildContainer = async (req: Request, res: Response) => {
     }
   }
   const containerConfig = {
-    //Creates container config based on user inputs
     Image: req.body.image,
     name: req.body.name,
     ExposedPorts: {
@@ -76,7 +88,7 @@ export const buildContainer = async (req: Request, res: Response) => {
         ],
       },
     },
-    Env: [req.body.env],
+    Env: [`VERSION=${req.body.version}`, req.body.env],
   };
 
   console.log(containerConfig);

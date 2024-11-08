@@ -129,7 +129,17 @@ input {
   padding: 1rem;
   border-radius: 0.5rem;
   background-color: var(--secondary);
-  flex-grow: 1;
+  /*flex-grow: 1;*/
+}
+
+datalist {
+  overflow-y: scroll;
+  max-height: 2rem;
+}
+
+img.server-icon {
+  height: 1rem;
+  width: 1rem;
 }
 
 .circle {
@@ -274,6 +284,10 @@ glob {
 .exited {
   fill: var(--text_dark);
   filter: drop-shadow(0px 0px 10px 0px var(--off));
+}
+
+.wrap {
+  flex-wrap: wrap;
 }
 
 /*Tooltips*/
