@@ -2,7 +2,7 @@ function Footer() {
     return (
         <footer className="footer">
           <small className="muted">
-            Copyright @REKCOD 2024 • Contact Us
+            Github • Docker Hub
           </small>
         </footer>
     )

@@ -33,7 +33,7 @@ function NavTop() {
   return (
     <nav className="nav top row">
       <h5 className="center">
-        <span className="gradient-text">REKCOD</span>
+        <span className="gradient-text">SIMPLE</span>
         <small className="muted">.panel</small>
       </h5>
       <button className="row secondary center">

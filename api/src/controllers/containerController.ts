@@ -49,7 +49,6 @@ export const getContainers = async () => {
 
       containers.push(container);
     }
-    console.log(containers);
     return containers;
   } catch (err) {
     return console.error("Error processing containers:", err);
@@ -58,7 +57,6 @@ export const getContainers = async () => {
 
 wss.on("connection", (ws: any) => {
   console.log("Established connection");
-  ws.send("Sucessfully connected to socket");
   const sendLoop = () => {
     wss.clients.forEach(async (client: any) => {
       let data = await getContainers();
@@ -75,6 +73,7 @@ export const buildContainer = async (req: Request, res: Response) => {
       return res.status(500).json("Please fill out all the inputs");
     }
   }
+  
   const containerConfig = {
     Image: req.body.image,
     name: req.body.name,

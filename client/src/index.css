@@ -71,6 +71,10 @@ small {
   color: var(--text);
 }
 
+a {
+  all: unset;
+}
+
 body {
   background: linear-gradient(
     267deg,
@@ -219,11 +223,12 @@ glob {
 .nav {
   display: flex;
   top: 0;
-  z-index: 10;
+  z-index: 2;
 }
 
 .nav.left {
   position: sticky;
+  z-index: 6;
 }
 
 .nav.left svg {

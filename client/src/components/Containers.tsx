@@ -1,22 +1,13 @@
-//import { handleContainers } from "../utils/handleContainers";
-import { useState, useEffect } from "react";
-
-const ws = new WebSocket("wss://glorious-cod-6wj4pj674992j55-2400.app.github.dev");
+import { handleContainers, ws } from "../utils/handleContainers";
+import { useEffect } from "react";
 
 import "../index.css";
 
-console.log = function (data) {
-  alert(data);
-}
-
 function Containers() {
-  const [containers, appendContainers] = useState([]);
+  const { containers, changeState } = handleContainers();
 
-  //const { changeState } = handleContainers();
   useEffect(() => {
-    ws.onmessage = (e) => {
-      appendContainers(JSON.parse(e.data));
-    };
+    containers;
   }, []);
 
   // Play svg
@@ -40,14 +31,14 @@ function Containers() {
           <div className="server widget secondary row" key={index}>
             <div className="row">
               <button
-                //onClick={changeState}
+                onClick={changeState}
                 className="circle secondary"
                 id={container.id}
               >
                 {container.state == "running" ? pause : play}
               </button>
               <div className="center">
-                <h5>{container.names}</h5>
+                <a href={container.names}><h5>{container.names}</h5></a>
                 <small className="muted">{container.image}</small>
               </div>
             </div>
