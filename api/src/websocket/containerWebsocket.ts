@@ -1,5 +1,5 @@
 import { WebSocketServer } from "ws";
 
-const wss = new WebSocketServer({ port: 2400 });
+const logWss = new WebSocketServer({ port: 2401 });
 
-export default wss;
+export { logWss };

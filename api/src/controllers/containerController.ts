@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Docker from "dockerode";
 
-import wss from "../websocket/containerWebsocket";
+import { logWss } from "../websocket/containerWebsocket";
 
 var docker = new Docker();
 
@@ -34,37 +34,92 @@ export const startContainer = async (req: Request, res: Response) => {
   });
 };
 
-export const getContainers = async () => {
+export const getContainer = async (req: Request, res: Response) => {
+  let { id } = req.body;
+  const container = docker.getContainer(id);
+
+  try {
+    const containerStats = await container.stats({ stream: false });
+    const containerInfo = await container.inspect();
+    let containerData = {
+      /*Id: container.Id,
+      Image: container.Image,
+      Names: container.Names,
+      State: container.State,
+      max_usage: stats.memory_stats.max_usage,
+      usage: stats.memory_stats.usage*/
+      info: containerInfo,
+      stats: containerStats,
+    };
+
+    res.status(200).json(JSON.stringify(containerData));
+  } catch (err) {
+    res.status(500).json(`Error getting container ${id}`);
+    console.error("Error processing container:", err);
+  }
+}
+
+export const getContainers = async (req: Request, res: Response) => {
   let containers: any[] = [];
   try {
     const containerList = await docker.listContainers({ all: true });
 
     for (const containerInfo of containerList) {
       let container = {
-        id: containerInfo.Id,
-        image: containerInfo.Image,
-        names: containerInfo.Names,
-        state: containerInfo.State,
+        Id: containerInfo.Id,
+        Image: containerInfo.Image,
+        Names: containerInfo.Names,
+        State: containerInfo.State,
       };
 
       containers.push(container);
     }
-    return containers;
+    res.status(200).json(JSON.stringify(containers));
   } catch (err) {
-    return console.error("Error processing containers:", err);
+    res.status(500).json(`Error getting containers}`);
+    console.error("Error processing container:", err);
   }
 }
 
-wss.on("connection", (ws: any) => {
-  console.log("Established connection");
-  const sendLoop = () => {
-    wss.clients.forEach(async (client: any) => {
-      let data = await getContainers();
-      client.send(JSON.stringify(data));
-    })
-  }
-  setInterval(sendLoop, 1000);
-})
+logWss.on('connection', (ws) => {
+  console.log("Connected to client");
+  ws.on("message", (e) => {
+    try {
+      const { id } = JSON.parse(e.toString());
+      const container = docker.getContainer(id);
+
+      console.log(`Established stream to ${id}`)
+
+      container.attach({
+        stream: true, stdout: true, stderr: true, stdin: true, logs: false
+      }, function (error, stream) {
+        if (error) {
+          console.error("Error when attaching:", error);
+        }
+        if (stream) {
+          stream.on("data", (data) => {
+            console.log(data.toString());
+            ws.send(data.toString());
+          })
+          stream.on("end", () => {
+            console.log(`Closing stream to ${id}`);
+            ws.send("Closing RCON connection...");
+            ws.close();
+          })
+          ws.onclose = () => {
+            console.log(`Closing stream to ${id}`);
+            ws.send("Closing RCON connection...");
+            stream.end();
+          }
+        } else {
+          console.error("No stream exists, cannot pipe data!")
+        }
+      })
+    } catch (error) {
+      console.error("Error: ", error);
+    }
+  })
+});
 
 
 export const buildContainer = async (req: Request, res: Response) => {
@@ -73,7 +128,7 @@ export const buildContainer = async (req: Request, res: Response) => {
       return res.status(500).json("Please fill out all the inputs");
     }
   }
-  
+
   const containerConfig = {
     Image: req.body.image,
     name: req.body.name,
@@ -112,19 +167,3 @@ export const buildContainer = async (req: Request, res: Response) => {
     }
   });
 };
-
-//FOR TESTING
-/*async function removeStoppedContainers() {
-    const containers = await docker.listContainers({ all: true });
-    for (const containerInfo of containers) {
-        if (containerInfo.State === 'exited') {
-            const container = docker.getContainer(containerInfo.Id);
-            try {
-                await container.remove();
-                console.log(`Removed container: ${containerInfo.Names[0]}`);
-            } catch (err) {
-                console.error(`Error removing container: ${containerInfo.Names[0]}`, err);
-            }
-        }
-    }
-}*/

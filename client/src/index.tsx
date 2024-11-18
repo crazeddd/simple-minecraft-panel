@@ -7,6 +7,7 @@ import BuildServer from "./routes/BuildServer";
 import Panel from "./routes/Panel";
 import Support from "./routes/Support";
 import AccountSettings from "./routes/AccountSettings";
+import Container from "./routes/Container";
 
 import "./index.css";
 
@@ -31,11 +32,14 @@ const router = createBrowserRouter([
     element: <AccountSettings />,
     errorElement: <ErrorPage />,
   },
+  {
+    path: "/container/:id",
+    element: <Container />,
+    ErrorElement: <ErrorPage />
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
-  <React.StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
 );

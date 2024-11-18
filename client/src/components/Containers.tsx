@@ -1,10 +1,15 @@
-import { handleContainers, ws } from "../utils/handleContainers";
 import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
-import "../index.css";
+import { handleContainers } from "../utils/handleContainers";
+
+const apiHost = import.meta.env.VITE_API_HOST;
 
 function Containers() {
-  const { containers, changeState } = handleContainers();
+  const { containers, getContainers, changeState } = handleContainers();
+  const navigate = useNavigate();
+
+  getContainers();
 
   useEffect(() => {
     containers;
@@ -24,6 +29,10 @@ function Containers() {
     </svg>
   );
 
+  const handleContainerReroute = (id: String) => {
+    navigate(`/container/${id}`);
+  };
+
   return (
     <>
       <div className="servers column">
@@ -33,18 +42,18 @@ function Containers() {
               <button
                 onClick={changeState}
                 className="circle secondary"
-                id={container.id}
+                id={container.Id}
               >
-                {container.state == "running" ? pause : play}
+                {container.State == "running" ? pause : play}
               </button>
               <div className="center">
-                <a href={container.names}><h5>{container.names}</h5></a>
-                <small className="muted">{container.image}</small>
+                <h5 id="name" onClick={() => handleContainerReroute(container.Id)}>{container.Names}</h5>
+                <small className="muted">{container.Image}</small>
               </div>
             </div>
             <div className="center">
               <svg
-                className={container.state}
+                className={container.State}
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 640 512"
               >

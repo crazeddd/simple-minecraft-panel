@@ -2,13 +2,20 @@ import { useState } from "react";
 
 const apiHost = import.meta.env.VITE_API_HOST;
 
-const ws = new WebSocket("wss://glorious-cod-6wj4pj674992j55-2400.app.github.dev");
-
 const handleContainers = () => {
   const [containers, appendContainers] = useState([]);
 
-  ws.onmessage = (e) => {
-    appendContainers(JSON.parse(e.data));
+  const getContainers = () => {
+    let url = `${apiHost}/container/get-containers`;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
+      .then((res) => res.json())
+      .then((data) => appendContainers(JSON.parse(data)))
+      .catch((error) => console.error("Error:", error));
   };
 
   const updateContainers = (type: string, id: any) => {
@@ -27,17 +34,19 @@ const handleContainers = () => {
 
   const changeState = async (self: any) => {
     let containerId = self.currentTarget.id;
-    let container = containers.find(
-      (container: any) => container.id === containerId
+    let container = await containers.find(
+      (container: any) => container.Id === containerId
     );
+
+    console.log(container);
 
     if (!container) return "No such container!";
 
-    let command = container.state === "running" ? "stop" : "start";
+    let command = container.State === "running" ? "stop" : "start";
     updateContainers(command, containerId);
   };
 
-  return { containers, changeState };
+  return { containers, changeState, getContainers };
 };
 
-export { handleContainers, ws };
+export { handleContainers };
