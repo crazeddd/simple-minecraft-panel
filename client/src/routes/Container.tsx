@@ -42,12 +42,6 @@ function Container() {
       .catch((error) => console.error("Error:", error));
   };
 
-  /*document.addEventListener("keydown", (e) => {
-    if (e.keyCode == 13) {
-      console.log("e");
-    }
-  });*/
-
   useEffect(() => {
     getContainer(id);
 
@@ -81,17 +75,24 @@ function Container() {
             {container ? (
               <div className="column grow gp-1">
                 <div className="row">
+                  <a><b>Home</b></a>
+                  <a className="muted">Config</a>
+                  <a className="muted">Files</a>
+                  <a className="muted">Mods/Plugins</a>
+                </div>
+                <hr></hr>
+                <div className="row">
                   <button
                     onClick={changeState}
                     className="circle secondary"
-                    id={container.info.Id}
+                    id={container.Id}
                   >
-                    {container.info.State.Status == "running" ? pause : play}
+                    {container.State == "running" ? pause : play}
                   </button>
 
                   <div className="center">
                     <h5>{container.info.Name}</h5>
-                    <small className="muted">{container.info.Image}</small>
+                    <small className="muted">{container.info.Config.Image}</small>
                   </div>
                 </div>
                 <div className="widget column console secondary">
@@ -102,6 +103,7 @@ function Container() {
                   </div>
                 </div>
                 <input id="console-input"></input>
+                <button></button>
                 <p>{Math.round((container.stats.memory_stats.usage / 1e+9) * 100) / 100}Gb / {Math.round((container.stats.memory_stats.limit / 1e+9) * 100) / 100}Gb</p>
               </div>
             ) : (

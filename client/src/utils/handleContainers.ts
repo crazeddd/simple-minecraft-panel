@@ -38,8 +38,6 @@ const handleContainers = () => {
       (container: any) => container.Id === containerId
     );
 
-    console.log(container);
-
     if (!container) return "No such container!";
 
     let command = container.State === "running" ? "stop" : "start";

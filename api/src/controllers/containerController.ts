@@ -50,6 +50,8 @@ export const getContainer = async (req: Request, res: Response) => {
       usage: stats.memory_stats.usage*/
       info: containerInfo,
       stats: containerStats,
+      State: containerInfo.State.Status,
+      Id: containerInfo.Id
     };
 
     res.status(200).json(JSON.stringify(containerData));
@@ -85,6 +87,7 @@ logWss.on('connection', (ws) => {
   console.log("Connected to client");
   ws.on("message", (e) => {
     try {
+      console.log(e);
       const { id } = JSON.parse(e.toString());
       const container = docker.getContainer(id);
 
@@ -104,7 +107,6 @@ logWss.on('connection', (ws) => {
           stream.on("end", () => {
             console.log(`Closing stream to ${id}`);
             ws.send("Closing RCON connection...");
-            ws.close();
           })
           ws.onclose = () => {
             console.log(`Closing stream to ${id}`);

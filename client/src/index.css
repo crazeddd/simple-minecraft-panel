@@ -76,6 +76,10 @@ a {
   all: unset;
 }
 
+hr {
+  border: 1px solid var(--secondary);
+}
+
 body {
   background: linear-gradient(267deg,
       var(--background_dark),
