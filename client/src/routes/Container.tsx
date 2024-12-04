@@ -6,10 +6,8 @@ import Nav from "../components/Nav";
 import NavTop from "../components/NavTop";
 import Footer from "../components/Footer";
 
-const apiHost = import.meta.env.VITE_API_HOST;
-
 function Container() {
-  const { changeState } = handleContainers();
+  const { containers, getContainers, changeState } = handleContainers();
   const [container, setContainer] = useState();
   const [logs, setLogs] = useState([]);
   const id = useParams();
@@ -28,41 +26,26 @@ function Container() {
     </svg>
   );
 
-  const getContainer = (id: any) => {
-    let url = `${apiHost}/container/get-container`;
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(id),
-    })
-      .then((res) => res.json())
-      .then((data) => setContainer(JSON.parse(data)))
-      .catch((error) => console.error("Error:", error));
-  };
-
   useEffect(() => {
-    getContainer(id);
-
-    container;
-
-    const ws = new WebSocket("wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev");
+    const ws = new WebSocket("ws://localhost:2401"); //GITSPACES: wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev
 
     ws.onopen = () => {
+      console.log(`Sucessfully connected to container ws`);
       ws.send(JSON.stringify(id));
       ws.onmessage = (e) => {
         let data = e.data;
-        setLogs((values: string[]) => ([...values, data]));
-      }
+        setLogs((values: string[]) => [...values, data]);
+      };
       ws.onclose = () => {
         console.log(`Connection to ${id} closed`);
-      }
+      };
       window.onbeforeunload = function () {
-        ws.onclose = function () { }; // disable onclose handler first
+        ws.onclose = function () {}; // disable onclose handler first
         ws.close();
       };
-    }
+    };
+
+    getContainers();
   }, []);
 
   return (
@@ -70,29 +53,31 @@ function Container() {
       <Nav />
       <main>
         <NavTop />
-        <div className="widget-wrapper">
-          <div className="widget secondary row">
-            {container ? (
+        <div className="widget-wrapper ">
+        <div className="widget secondary row">
+          {containers.length != 0 ? (
               <div className="column grow gp-1">
-                <div className="row">
-                  <a><b>Home</b></a>
+                <div className="row gp-1">
+                  <a>
+                    <b>Home</b>
+                  </a>
                   <a className="muted">Config</a>
-                  <a className="muted">Files</a>
+                  <a className="muted" href={`${containers[0].Id}/files`}>Files</a>
                   <a className="muted">Mods/Plugins</a>
                 </div>
                 <hr></hr>
-                <div className="row">
+                <div className="row gp-1">
                   <button
                     onClick={changeState}
                     className="circle secondary"
-                    id={container.Id}
+                    id={containers[0].Id}
                   >
-                    {container.State == "running" ? pause : play}
+                    {containers[0].State == "running" ? pause : play}
                   </button>
 
                   <div className="center">
-                    <h5>{container.info.Name}</h5>
-                    <small className="muted">{container.info.Config.Image}</small>
+                    <h5>{containers[0].Names}</h5>
+                    <small className="muted">{containers[0].Image}</small>
                   </div>
                 </div>
                 <div className="widget column console secondary">
@@ -103,12 +88,12 @@ function Container() {
                   </div>
                 </div>
                 <input id="console-input"></input>
-                <button></button>
-                <p>{Math.round((container.stats.memory_stats.usage / 1e+9) * 100) / 100}Gb / {Math.round((container.stats.memory_stats.limit / 1e+9) * 100) / 100}Gb</p>
+                {/*<p>{Math.round((container.stats.memory_stats.usage / 1e+9) * 100) / 100}Gb / {Math.round((container.stats.memory_stats.limit / 1e+9) * 100) / 100}Gb</p>*/}
               </div>
-            ) : (
-              <p>Loading...</p>
-            )}
+            
+          ) : (
+            <p>Loading...</p>
+          )}
           </div>
         </div>
         <Footer />

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Docker from "dockerode";
 
-import { logWss } from "../websocket/containerWebsocket";
+import { wss } from "../websocket/containerWebsocket";
 
 var docker = new Docker();
 
@@ -23,7 +23,6 @@ export const startContainer = async (req: Request, res: Response) => {
   let { id } = req.body;
   let container = docker.getContainer(id);
   container.start((error: string) => {
-    //Attempts to start container
     if (error) {
       res.status(500).json(`Failed to start container ${id}`);
       console.error(`Error when starting ${id} (${error})`);
@@ -83,7 +82,7 @@ export const getContainers = async (req: Request, res: Response) => {
   }
 }
 
-logWss.on('connection', (ws) => {
+wss.on('connection', (ws) => {
   console.log("Connected to client");
   ws.on("message", (e) => {
     try {

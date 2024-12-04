@@ -1,18 +1,14 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
 
 import { handleContainers } from "../utils/handleContainers";
 
-const apiHost = import.meta.env.VITE_API_HOST;
-
 function Containers() {
   const { containers, getContainers, changeState } = handleContainers();
-  const navigate = useNavigate();
-
-  getContainers();
 
   useEffect(() => {
-    containers;
+    getContainers();
+    const interval = setInterval(getContainers, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // Play svg
@@ -29,16 +25,11 @@ function Containers() {
     </svg>
   );
 
-  const handleContainerReroute = (id: String) => {
-    navigate(`/container/${id}`);
-  };
-
   return (
-    <>
-      <div className="servers column">
+      <div className="servers column gp-1">
         {containers.map((container: any, index: number) => (
           <div className="server widget secondary row" key={index}>
-            <div className="row">
+            <div className="row gp-1">
               <button
                 onClick={changeState}
                 className="circle secondary"
@@ -47,7 +38,7 @@ function Containers() {
                 {container.State == "running" ? pause : play}
               </button>
               <div className="center">
-                <h5 id="name" onClick={() => handleContainerReroute(container.Id)}>{container.Names}</h5>
+                <a href={`/containers/${container.Id}`}><h5 id="name">{container.Names}</h5></a>
                 <small className="muted">{container.Image}</small>
               </div>
             </div>
@@ -70,7 +61,6 @@ function Containers() {
           </div>
         )}
       </div>
-    </>
   );
 }
 

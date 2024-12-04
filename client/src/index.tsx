@@ -8,6 +8,7 @@ import Panel from "./routes/Panel";
 import Support from "./routes/Support";
 import AccountSettings from "./routes/AccountSettings";
 import Container from "./routes/Container";
+import Files from "./routes/Files";
 
 import "./index.css";
 
@@ -33,8 +34,13 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: "/container/:id",
+    path: "/containers/:id",
     element: <Container />,
+    ErrorElement: <ErrorPage />
+  },
+  {
+    path: "/containers/:id/files",
+    element: <Files />,
     ErrorElement: <ErrorPage />
   }
 ]);

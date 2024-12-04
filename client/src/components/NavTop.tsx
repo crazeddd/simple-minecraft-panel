@@ -36,7 +36,7 @@ function NavTop() {
         <span className="gradient-text">SIMPLE</span>
         <small className="muted">.panel</small>
       </h5>
-      <button className="row secondary center">
+      <button className="row secondary center gp-2">
         <p className="muted">
           {apiStatus ? "API is online" : "API not responding"}
         </p>
