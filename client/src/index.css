@@ -369,6 +369,20 @@ glob {
   word-break: break-word;
   overflow: auto;
   line-height: 1.2rem;
+  border-radius: 0.5rem 0.5rem 0rem 0rem;
+}
+
+#console-input {
+  margin-top: -0.5rem;
+  background: var(--background_dark);
+  border-radius: 0rem 0rem 0.5rem 0.5rem;
+  align-items: center;
+  padding: 0 2rem 0 2rem;
+}
+
+#console-input input {
+  background: var(--background_dark);
+  width: 100%;
 }
 
 /*FILES*/
@@ -381,6 +395,10 @@ glob {
   word-break: break-word;
   overflow: auto;
   line-height: 1.2rem;
+}
+
+.file-icon {
+  fill: var(--text);
 }
 
 /*THROBBER*/

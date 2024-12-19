@@ -8,7 +8,7 @@ import Panel from "./routes/Panel";
 import Support from "./routes/Support";
 import AccountSettings from "./routes/AccountSettings";
 import Container from "./routes/Container";
-import Files from "./routes/Files";
+import Files from "./routes/FileManager";
 
 import "./index.css";
 

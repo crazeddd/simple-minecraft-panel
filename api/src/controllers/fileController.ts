@@ -1,24 +1,28 @@
 import { Request, Response } from "express";
-import Docker from "dockerode";
-import fs1 from "fs";
-import path from "path";
+import fsInit from "fs";
+//import path from "path";
 
-const fs = fs1.promises;
+const fs = fsInit.promises;
 
-var root = "../../../dockermc";
+var root = "/containers/";
 
 export const readDirectory = async (req: Request, res: Response) => {
-  //const { id } = req.body;
-  const containerDir = root + "/test";
+  const { path } = req.body;
+  let containerPath: string = root;
+  if (path) containerPath += path, console.log(containerPath);
 
   try {
-    const files = await fs.readdir(containerDir);
-    const fileList = files.map((file) => file);
-    res.status(200).json(JSON.stringify(fileList));
+    if ((await fs.lstat(containerPath)).isDirectory()) {
+      const files: string[] = await fs.readdir(containerPath);
+      res.status(200).json(JSON.stringify(files));
+    } else {
+      const file = fs.readFile(containerPath);
+      res.status(200).json(JSON.stringify(file));
+    }
   } catch (err) {
     console.error(err);
     res
       .status(500)
-      .json(JSON.stringify(`Failed to read file directory at ${path}`));
+      .json(JSON.stringify(`Failed to read file directory at ${containerPath}`));
   }
 };

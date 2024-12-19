@@ -7,6 +7,7 @@
 import app from "../src/app";
 import debug from "debug";
 import { createServer } from "http";
+import { dockerWss } from "../src/websocket/dockerWs"
 
 debug("express-project:server");
 
@@ -22,6 +23,13 @@ app.set("port", port);
  */
 
 const server = createServer(app);
+
+/**
+ * Create Websocket for Docker Containers
+ */
+
+dockerWss;
+
 
 /**
  * Listen on provided port, on all network interfaces.

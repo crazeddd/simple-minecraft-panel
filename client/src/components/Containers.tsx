@@ -26,41 +26,40 @@ function Containers() {
   );
 
   return (
-      <div className="servers column gp-1">
-        {containers.map((container: any, index: number) => (
-          <div className="server widget secondary row" key={index}>
-            <div className="row gp-1">
-              <button
-                onClick={changeState}
-                className="circle secondary"
-                id={container.Id}
-              >
-                {container.State == "running" ? pause : play}
-              </button>
-              <div className="center">
-                <a href={`/containers/${container.Id}`}><h5 id="name">{container.Names}</h5></a>
-                <small className="muted">{container.Image}</small>
-              </div>
-            </div>
+    <div className="servers column gp-1">
+      {containers.length != 0 ? (containers.map((container: any, index: number) => (
+        <div className="server widget secondary row" key={index}>
+          <div className="row gp-1">
+            <button
+              onClick={changeState}
+              className="circle secondary"
+              id={container.Id}
+            >
+              {container.State == "running" ? pause : play}
+            </button>
             <div className="center">
-              <svg
-                className={container.State}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 640 512"
-              >
-                <path d="M576 0c17.7 0 32 14.3 32 32V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V32c0-17.7 14.3-32 32-32zM448 96c17.7 0 32 14.3 32 32V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V128c0-17.7 14.3-32 32-32zM352 224V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V224c0-17.7 14.3-32 32-32s32 14.3 32 32zM192 288c17.7 0 32 14.3 32 32V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V320c0-17.7 14.3-32 32-32zM96 416v64c0 17.7-14.3 32-32 32s-32-14.3-32-32V416c0-17.7 14.3-32 32-32s32 14.3 32 32z" />
-              </svg>
+              <a href={`/containers/${container.Id}`}><h5 id="name">{container.Names}</h5></a>
+              <small className="muted">{container.Image}</small>
             </div>
           </div>
-        ))}
-        {containers.length == 0 && (
-          <div className="server widget secondary row">
-            <p className="muted">
-              Its looking a bit empty in here, why not create a server?
-            </p>
+          <div className="center">
+            <svg
+              className={container.State}
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 640 512"
+            >
+              <path d="M576 0c17.7 0 32 14.3 32 32V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V32c0-17.7 14.3-32 32-32zM448 96c17.7 0 32 14.3 32 32V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V128c0-17.7 14.3-32 32-32zM352 224V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V224c0-17.7 14.3-32 32-32s32 14.3 32 32zM192 288c17.7 0 32 14.3 32 32V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V320c0-17.7 14.3-32 32-32zM96 416v64c0 17.7-14.3 32-32 32s-32-14.3-32-32V416c0-17.7 14.3-32 32-32s32 14.3 32 32z" />
+            </svg>
           </div>
-        )}
-      </div>
+        </div>
+      ))) : (
+        <div className="server widget secondary row">
+          <p className="muted">
+            Its looking a bit empty in here, why not create a server?
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
 
