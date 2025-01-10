@@ -3,19 +3,27 @@ import { useState } from "react";
 const apiHost = import.meta.env.VITE_API_HOST;
 
 const handleContainers = () => {
-  const [containers, appendContainers] = useState([]);
+  const [containers, setContainers] = useState([]);
 
-  const getContainers = () => {
-    let url = `${apiHost}/container/get-containers`;
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      }
-    })
-      .then((res) => res.json())
-      .then((data) => appendContainers(JSON.parse(data)))
-      .catch((error) => console.error("Error:", error));
+  const getContainers = async () => {
+    const url = `${apiHost}/container/get-containers`;
+    try {
+      const res = fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await (await res).json();
+      const parsedData = JSON.parse(data);
+
+      setContainers(parsedData);
+      return parsedData;
+    } catch (err) {
+      console.error("Error:", err);
+      return [];
+    }
   };
 
   const updateContainers = (type: string, id: any) => {
@@ -29,19 +37,13 @@ const handleContainers = () => {
     })
       .then((res) => res.json())
       .then((data) => console.log(data))
-      .catch((error) => console.error("Error:", error));
+      .catch((err) => console.error("Error:", err));
   };
 
-  const changeState = async (self: any) => {
-    let containerId = self.currentTarget.id;
-    let container = await containers.find(
-      (container: any) => container.Id === containerId
-    );
-
-    if (!container) return "No such container!";
-
-    let command = container.State === "running" ? "stop" : "start";
-    updateContainers(command, containerId);
+  const changeState = async (self: any, state: string) => {
+    const id = self.currentTarget.id;
+    const command = state === "running" ? "stop" : "start";
+    updateContainers(command, id);
   };
 
   return { containers, changeState, getContainers };

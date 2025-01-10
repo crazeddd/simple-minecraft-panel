@@ -31,7 +31,7 @@ function Containers() {
         <div className="server widget secondary row" key={index}>
           <div className="row gp-1">
             <button
-              onClick={changeState}
+              onClick={(e) => changeState(e, container.State)}
               className="circle secondary"
               id={container.Id}
             >

@@ -1,4 +1,5 @@
 import { useEffect, useState} from "react";
+import { useParams } from "react-router-dom";
 
 import handleFiles from "../utils/handleFiles";
 
@@ -10,6 +11,7 @@ let currentDir = "";
 
 function Files() {
   const { files, readDir } = handleFiles();
+  const { id } = useParams();
 
   useEffect(() => {
     readDir("/.");
@@ -24,7 +26,7 @@ function Files() {
           <div className="widget secondary row">
             <div className="column grow gp-1">
               <div className="row gp-1">
-                <a className="muted" href="..">
+                <a className="muted" href={`/containers/${id}`}>
                   Main
                 </a>
                 <a className="muted">Config</a>

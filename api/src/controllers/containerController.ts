@@ -31,34 +31,7 @@ export const startContainer = async (req: Request, res: Response) => {
   });
 };
 
-export const getContainer = async (req: Request, res: Response) => {
-  let { id } = req.body;
-  const container = docker.getContainer(id);
-
-  try {
-    const containerStats = await container.stats({ stream: false });
-    const containerInfo = await container.inspect();
-    
-    let containerData = {
-      /*Id: container.Id,
-      Image: container.Image,
-      Names: container.Names,
-      State: container.State,
-      max_usage: stats.memory_stats.max_usage,
-      usage: stats.memory_stats.usage*/
-      info: containerInfo,
-      stats: containerStats,
-      State: containerInfo.State.Status,
-      Id: containerInfo.Id
-    };
-
-    res.status(200).json(JSON.stringify(containerData));
-  } catch (err) {
-    res.status(500).json(`Error getting container ${id}`);
-    console.error("Error processing container:", err);
-  }
-}
-
+//General data for containers that doesnt need to be polled (ex. Name, Id)
 export const getContainers = async (req: Request, res: Response) => {
   let containers: any[] = [];
   try {

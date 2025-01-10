@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -9,10 +8,16 @@ import Support from "./routes/Support";
 import AccountSettings from "./routes/AccountSettings";
 import Container from "./routes/Container";
 import Files from "./routes/FileManager";
+import SignUp from "./routes/SignUp"
 
 import "./index.css";
 
 const router = createBrowserRouter([
+  {
+    path: "/signup",
+    element: <SignUp />,
+    errorElement: <ErrorPage />,
+  },
   {
     path: "/",
     element: <Panel />,

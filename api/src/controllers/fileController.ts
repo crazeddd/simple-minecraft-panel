@@ -4,7 +4,7 @@ import fsInit from "fs";
 
 const fs = fsInit.promises;
 
-var root = "/containers/";
+var root = ".";
 
 export const readDirectory = async (req: Request, res: Response) => {
   const { path } = req.body;

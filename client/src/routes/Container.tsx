@@ -1,5 +1,5 @@
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { handleContainers } from "../utils/handleContainers";
 
 import Nav from "../components/Nav";
@@ -10,36 +10,52 @@ import Icons from "../../assets/Icons";
 
 function Container() {
   const { containers, getContainers, changeState } = handleContainers();
+  const [container, setContainer] = useState({});
   const [logs, setLogs] = useState([]);
-  const id = useParams();
+  const [stats, setStats] = useState({});
+  const { id } = useParams();
 
   // Svg Icons
   const { play, pause } = Icons();
 
   useEffect(() => {
-    const ws = new WebSocket("wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev"); //GITSPACES: wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev
+    getContainers();
+
+    const ws: WebSocket = new WebSocket(
+      "wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev"
+    ); //GITSPACES: wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev
 
     ws.onopen = () => {
-      console.log(`Sucessfully connected to container ws`);
+      console.log(`Sucessfully connected to ${id}`);
       ws.send(JSON.stringify(id));
 
       ws.onmessage = (e) => {
-        let data = e.data;
-        setLogs((values: string[]) => [...values, data]);
+        const { type, data } = JSON.parse(e.data);
+
+        if (type == "log") {
+          const lines = data.split(/\r?\n/).flat();
+          setLogs((values: string[]) => [...values, ...lines]);
+        }
+        if (type == "stats") data ? setStats(data) : console.log(stats);
       };
 
       ws.onclose = () => {
         console.log(`Connection to ${id} closed`);
       };
-
-      window.onbeforeunload = () => {
-        ws.onclose = function () { }; // disable onclose handler first
-        ws.close();
-      };
     };
 
-    getContainers();
+    window.onbeforeunload = () => {
+      ws.onclose = function () {}; // disable onclose handler first
+      ws.close();
+    };
+
+    const interval = setInterval(getContainers, 1000);
+    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    setContainer(containers[0]);
+  }, [containers]);
 
   return (
     <>
@@ -48,30 +64,36 @@ function Container() {
         <NavTop />
         <div className="widget-wrapper ">
           <div className="widget secondary row">
-            {!!containers.length ? (
+            {container ? (
               <div className="column grow gp-1">
                 <div className="row gp-1">
                   <a>
                     <b>Main</b>
                   </a>
                   <a className="muted">Config</a>
-                  <a className="muted" href={`${containers[0].Id}/files`}>Files</a>
+                  <a className="muted" href={`${container.Id}/files`}>
+                    Files
+                  </a>
                   <a className="muted">Mods/Plugins</a>
                 </div>
                 <hr></hr>
                 <div className="row gp-1">
                   <button
-                    onClick={changeState}
+                    onClick={(e) => changeState(e, container.State)}
                     className="circle secondary"
-                    id={containers[0].Id}
-                    aria-label={containers[0].State == "running" ? "Pause container" : "Start container"}
+                    id={container.Id}
+                    aria-label={
+                      container.State == "running"
+                        ? "Pause container"
+                        : "Start container"
+                    }
                   >
-                    {containers[0].State == "running" ? pause : play}
+                    {container.State == "running" ? pause : play}
                   </button>
 
                   <div className="center">
-                    <h5>{containers[0].Names}</h5>
-                    <small className="muted">{containers[0].Image}</small>
+                    <h5>{container.Names}</h5>
+                    <small className="muted">{container.Image}</small>
                   </div>
                 </div>
                 <div className="widget column console secondary">
@@ -85,9 +107,16 @@ function Container() {
                   <p>&gt;</p>
                   <input></input>
                 </div>
-                {/*<p>{Math.round((container.stats.memory_stats.usage / 1e+9) * 100) / 100}Gb / {Math.round((container.stats.memory_stats.limit / 1e+9) * 100) / 100}Gb</p>*/}
+                {!!stats.length ? (
+                  <p>
+                    {Math.round((stats.memory_stats.usage / 1e9) * 100) / 100}Gb
+                    / {Math.round((stats.memory_stats.limit / 1e9) * 100) / 100}
+                    Gb
+                  </p>
+                ) : (
+                  <p>Loading...</p>
+                )}
               </div>
-
             ) : (
               <p>Loading...</p>
             )}

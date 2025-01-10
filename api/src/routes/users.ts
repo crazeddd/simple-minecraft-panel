@@ -1,9 +1,11 @@
-import express from 'express';
+import express from "express";
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req: any, res: any, next: any) {
-  res.send('respond with a resource');
-});
+import {
+  signUp
+} from "../controllers/userController";
+
+router.post("/signup", signUp); //Creates new user
+
 
 export default router;
