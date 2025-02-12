@@ -2,10 +2,12 @@ import express from "express";
 var router = express.Router();
 
 import {
-  signUp
+  createAccount,
+  login,
 } from "../controllers/userController";
 
-router.post("/signup", signUp); //Creates new user
+router.post("/signup", createAccount); 
 
+router.post("/login", login); 
 
 export default router;

@@ -3,13 +3,13 @@ import { useForm } from "../utils/useForm";
 
 const apiHost = import.meta.env.VITE_API_HOST;
 
-export default function SignUp() {
+export default function Login() {
   const { form, handleChange } = useForm();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = `${apiHost}/users/signup`;
+    const url = `${apiHost}/users/login`;
     try {
       const res = fetch(url, {
         method: "POST",
@@ -22,8 +22,9 @@ export default function SignUp() {
 
       JSON.stringify(console.log(data.message));
 
-      if (!data.error) {
-        navigate("/login");
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        navigate("/");
       }
     } catch (error: unknown) {
       console.error("Unexpected error when fetching", error);
@@ -32,7 +33,7 @@ export default function SignUp() {
 
   return (
     <form className="auth-form column gp-1" onSubmit={handleSubmit}>
-      <h4>Sign Up</h4>
+      <h4>Login</h4>
       <hr></hr>
       <div className="column gp-2">
         <input

@@ -1,4 +1,4 @@
-function Nav() {
+export default function Nav() {
   return (
     <nav className="nav left column gp-1">
       <a href="/">
@@ -44,5 +44,3 @@ function Nav() {
     </nav>
   );
 }
-
-export default Nav;

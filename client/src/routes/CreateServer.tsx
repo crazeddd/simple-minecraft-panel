@@ -7,11 +7,11 @@ import Footer from "../components/Footer";
 
 const apiHost = import.meta.env.VITE_API_HOST;
 
-function BuildServer() {
+function CreateServer() {
   const { form, handleChange } = useForm();
   let navigate = useNavigate();
 
-  const sumbitForm = async (e: any) => {
+  const sumbitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     let url = `${apiHost}/docker/build-container`;
@@ -42,7 +42,7 @@ function BuildServer() {
         <form className="widget secondary column" onSubmit={sumbitForm}>
           <h5>New Server</h5>
           <br />
-          <div className="row wrap">
+          <div className="row">
             <input
               placeholder="Name"
               name="name"
@@ -54,8 +54,9 @@ function BuildServer() {
               placeholder="Version"
               value={form.version || ""}
               onChange={handleChange}
-              list="versions"/>
-              <datalist id="versions">
+              list="versions"
+            />
+            <datalist id="versions">
               <option value="1.20.4"></option>
               <option value="1.20.1"></option>
               <option value="1.20.0"></option>
@@ -112,4 +113,4 @@ function BuildServer() {
   );
 }
 
-export default BuildServer;
+export default CreateServer;

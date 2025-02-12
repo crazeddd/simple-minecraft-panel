@@ -1,10 +1,11 @@
 import express from "express";
+import { auth } from "../utils/auth";
 var router = express.Router();
 
 import {
   stopContainer,
   startContainer,
-  buildContainer,
+  createContainer,
   getContainers,
 } from "../controllers/containerController";
 
@@ -14,6 +15,6 @@ router.post("/start", startContainer); //Starts container
 
 router.get("/get-containers", getContainers); //Gets all containers basic metadata
 
-//router.post("/build-container", buildContainer); //Builds new container
+router.post("/build-container", auth, createContainer); //Builds new container
 
 export default router;

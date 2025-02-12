@@ -7,22 +7,25 @@ const fs = fsInit.promises;
 var root = ".";
 
 export const readDirectory = async (req: Request, res: Response) => {
-  const { path } = req.body;
-  let containerPath: string = root;
-  if (path) containerPath += path, console.log(containerPath);
+  let { path } = req.body;
+  path = root + path;
 
   try {
-    if ((await fs.lstat(containerPath)).isDirectory()) {
-      const files: string[] = await fs.readdir(containerPath);
+    if ((await fs.lstat(path)).isDirectory()) {
+      const files: string[] = await fs.readdir(path);
       res.status(200).json(JSON.stringify(files));
     } else {
-      const file = fs.readFile(containerPath);
+      const file = fs.readFile(path);
       res.status(200).json(JSON.stringify(file));
     }
   } catch (err) {
     console.error(err);
     res
       .status(500)
-      .json(JSON.stringify(`Failed to read file directory at ${containerPath}`));
+      .json(JSON.stringify(`Failed to read file directory at ${path}`));
   }
+};
+
+export const readFile = async (req: Request, res: Response) => {
+  const { path } = req.body;
 };

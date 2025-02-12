@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 const apiHost = import.meta.env.VITE_API_HOST;
 
-function NavTop() {
+export default function NavTop() {
   const [apiStatus, setApiStatus] = useState(true);
 
   //Pings API server
@@ -52,5 +52,3 @@ function NavTop() {
     </nav>
   );
 }
-
-export default NavTop;

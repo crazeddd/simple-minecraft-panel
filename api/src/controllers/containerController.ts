@@ -1,5 +1,7 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import Docker from "dockerode";
+import Container from "../db/containerModel";
+import { userInfo } from "os";
 
 var docker = new Docker();
 
@@ -47,56 +49,60 @@ export const getContainers = async (req: Request, res: Response) => {
 
       containers.push(container);
     }
-    res.status(200).json(JSON.stringify(containers));
+    res.status(200).send(JSON.stringify(containers));
   } catch (err) {
-    res.status(500).json(`Error getting containers}`);
+    res.status(500).send(`Error getting containers}`);
     console.error("Error processing container:", err);
   }
-}
+};
 
+export const createContainer = async (req: Request, res: Response) => {
+  try {
+    for (let input in req.body) {
+      if (input == null) {
+        throw new Error("Please fill out all the inputs");
+      }
+    }
 
-export const buildContainer = async (req: Request, res: Response) => {
-  for (let input in req.body) {
-    if (input == null) {
-      return res.status(500).json("Please fill out all the inputs");
+    const containerConfig = {
+      Image: req.body.image,
+      name: req.body.name,
+      ExposedPorts: {
+        [`${req.body.port}/${req.body.protocol}`]: {},
+      },
+      HostConfig: {
+        PortBindings: {
+          [`${req.body.port}/${req.body.protocol}`]: [
+            { HostPort: req.body.host_port },
+          ],
+        },
+      },
+      Env: [`VERSION=${req.body.version}`, req.body.env],
+    };
+
+    console.log(containerConfig);
+
+    docker.createContainer(
+      containerConfig,
+      async (error: string, container: any) => {
+        if (error) {
+          throw new Error(`Failed to create container ${error}`);
+        }
+
+        const newContainer = new Container({
+          owner_id: req.body.token.userId,
+          id: container.id,
+        });
+
+        await newContainer.save();
+      }
+    );
+
+    res.status(200).send(`Created new container ${req.body.name}`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).send(error.message);
+      console.error(error.message);
     }
   }
-
-  const containerConfig = {
-    Image: req.body.image,
-    name: req.body.name,
-    ExposedPorts: {
-      [`${req.body.port}/${req.body.protocol}`]: {},
-    },
-    HostConfig: {
-      PortBindings: {
-        [`${req.body.port}/${req.body.protocol}`]: [
-          { HostPort: req.body.host_port },
-        ],
-      },
-    },
-    Env: [`VERSION=${req.body.version}`, req.body.env],
-  };
-
-  console.log(containerConfig);
-
-  docker.createContainer(containerConfig, (error: string, container: any) => {
-    if (error) {
-      res.status(500).json(`Failed to create container ${error}`);
-      console.error(`Error creating container: ${error}`);
-    } else {
-      container.start((error: string) => {
-        if (error) {
-          console.error("Error starting container: ", error);
-        } else {
-          res
-            .status(200)
-            .json(`Container ${container} created and started successfully!`);
-          console.log(
-            `Container ${container} created and started successfully!`
-          );
-        }
-      });
-    }
-  });
 };

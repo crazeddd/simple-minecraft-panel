@@ -11,14 +11,11 @@ dockerWss.on("connection", (ws) => {
   ws.on("message", async (e: Buffer) => {
     try {
       const id = JSON.parse(e.toString());
-      console.log(id);
       const container = docker.getContainer(id);
 
       const logStream = await container.attach({
         stream: true,
         stdout: true,
-        stderr: true,
-        stdin: true,
         logs: true,
       });
 
@@ -30,12 +27,11 @@ dockerWss.on("connection", (ws) => {
       console.log(`Established data stream to ${id}`);
 
       logStream.on("data", (data: Buffer) => {
-
-        ws.send(JSON.stringify({ type: "log", data: data.toString()}));
+        ws.send(JSON.stringify({ type: "log", data: data.toString() }));
       });
 
       ws.onclose = () => {
-        logStream.end();
+        if (logStream) logStream.end;
         clearInterval(statsPoll);
       };
     } catch (err) {

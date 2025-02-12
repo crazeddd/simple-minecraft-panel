@@ -7,6 +7,7 @@ const handleContainers = () => {
 
   const getContainers = async () => {
     const url = `${apiHost}/container/get-containers`;
+
     try {
       const res = fetch(url, {
         method: "GET",
@@ -16,13 +17,9 @@ const handleContainers = () => {
       });
 
       const data = await (await res).json();
-      const parsedData = JSON.parse(data);
-
-      setContainers(parsedData);
-      return parsedData;
+      setContainers(data);
     } catch (err) {
       console.error("Error:", err);
-      return [];
     }
   };
 

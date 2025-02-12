@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { handleContainers } from "../utils/handleContainers";
 
-function Containers() {
+export default function Containers() {
   const { containers, getContainers, changeState } = handleContainers();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ function Containers() {
 
   return (
     <div className="servers column gp-1">
-      {containers.length != 0 ? (containers.map((container: any, index: number) => (
+      {!!containers.length ? (containers.map((container: any, index: number) => (
         <div className="server widget secondary row" key={index}>
           <div className="row gp-1">
             <button
@@ -62,5 +62,3 @@ function Containers() {
     </div>
   );
 }
-
-export default Containers;

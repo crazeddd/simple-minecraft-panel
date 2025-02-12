@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const apiHost = import.meta.env.VITE_API_HOST;
 
-import Icons from "../../assets/Icons";
+import Icons from "../../public/assets/Icons";
 
 const handleFiles = () => {
   const { folder, default_file } = Icons();
@@ -37,7 +37,11 @@ const handleFiles = () => {
       .catch((error: Error) => console.error("Error:", error));
   };
 
-  return { files, readDir };
+  const readFile = (path: string) => {
+    
+  }
+
+  return { files, readDir, readFile };
 };
 
 export default handleFiles;

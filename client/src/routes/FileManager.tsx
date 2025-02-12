@@ -1,4 +1,4 @@
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import handleFiles from "../utils/handleFiles";
@@ -7,11 +7,25 @@ import Nav from "../components/Nav";
 import NavTop from "../components/NavTop";
 import Footer from "../components/Footer";
 
-let currentDir = ""; 
+var path: string = "";
 
 function Files() {
-  const { files, readDir } = handleFiles();
+  const { files, readDir, readFile } = handleFiles();
+
   const { id } = useParams();
+
+  const handleFileClick = (file: string) => {
+    const extension = file[1].split(".")[1];
+
+    if (!extension) {
+      path += "/" + file[1];
+      readDir(path);
+    } else {
+      readFile(path + "/" + file[1]);
+    }
+
+    console.log(path);
+  };
 
   useEffect(() => {
     readDir("/.");
@@ -37,13 +51,19 @@ function Files() {
               </div>
               <hr></hr>
               <div className="column gp-1">
-                  {!!files.length ? (files.map((file: string, index: number) => (
-                    <a className="row gp-3 muted" key={index} onClick={() => {currentDir += "/" + file[1], readDir(currentDir), console.log(currentDir)}}>{file}</a>
-                  ))) : (
-                    <p className="muted">
-                      No files in location.
-                    </p>
-                  )}
+                {!!files.length ? (
+                  files.map((file: string, index: number) => (
+                    <a
+                      key={index}
+                      className="row gp-3 muted"
+                      onClick={() => handleFileClick(file)}
+                    >
+                      {file}
+                    </a>
+                  ))
+                ) : (
+                  <p className="muted">No files in location.</p>
+                )}
               </div>
             </div>
           </div>

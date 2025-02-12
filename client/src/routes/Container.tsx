@@ -5,14 +5,16 @@ import { handleContainers } from "../utils/handleContainers";
 import Nav from "../components/Nav";
 import NavTop from "../components/NavTop";
 import Footer from "../components/Footer";
+import Graph from "../components/Graph";
 
-import Icons from "../../assets/Icons";
+import Icons from "../../public/assets/Icons";
 
 function Container() {
   const { containers, getContainers, changeState } = handleContainers();
   const [container, setContainer] = useState({});
   const [logs, setLogs] = useState([]);
   const [stats, setStats] = useState({});
+
   const { id } = useParams();
 
   // Svg Icons
@@ -26,17 +28,17 @@ function Container() {
     ); //GITSPACES: wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev
 
     ws.onopen = () => {
-      console.log(`Sucessfully connected to ${id}`);
+      console.log(`Connected to ws for container: ${id}`);
       ws.send(JSON.stringify(id));
 
       ws.onmessage = (e) => {
         const { type, data } = JSON.parse(e.data);
-
+ 
         if (type == "log") {
           const lines = data.split(/\r?\n/).flat();
           setLogs((values: string[]) => [...values, ...lines]);
         }
-        if (type == "stats") data ? setStats(data) : console.log(stats);
+        if (type == "stats") setStats(data);
       };
 
       ws.onclose = () => {
@@ -54,7 +56,9 @@ function Container() {
   }, []);
 
   useEffect(() => {
-    setContainer(containers[0]);
+    if (!!containers.length) {
+      setContainer(containers.find(({ Id }: any) => Id === id));
+    }
   }, [containers]);
 
   return (
@@ -62,7 +66,7 @@ function Container() {
       <Nav />
       <main>
         <NavTop />
-        <div className="widget-wrapper ">
+        <div className="widget-wrapper">
           <div className="widget secondary row">
             {container ? (
               <div className="column grow gp-1">
