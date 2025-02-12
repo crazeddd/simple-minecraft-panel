@@ -1,15 +1,25 @@
+import { useNavigate } from "react-router";
+
 import Nav from "../components/Nav";
 import NavTop from "../components/NavTop";
 import Footer from "../components/Footer";
 
 function AccountSettings() {
+  const navigate = useNavigate();
+
+  const logOut = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
   return (
     <>
       <Nav />
       <main>
         <NavTop />
         <div>
-          <h5>Nothing to see here!</h5>
+          <button className="secondary" onClick={logOut}>
+            Log out
+          </button>
         </div>
         <Footer />
       </main>

@@ -1,0 +1,11 @@
+services:
+  mc:
+    image: itzg/minecraft-server
+    tty: true
+    stdin_open: true
+    ports:
+      - "25566:25566"
+    environment:
+      EULA: "TRUE"
+    volumes:
+      - ./data:/data

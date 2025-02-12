@@ -28,12 +28,12 @@ function Container() {
     ); //GITSPACES: wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev
 
     ws.onopen = () => {
-      console.log(`Connected to ws for container: ${id}`);
-      ws.send(JSON.stringify(id));
+      console.log(`Connected to container ws`);
+      ws.send(JSON.stringify({ type: "connect", message: id }));
 
       ws.onmessage = (e) => {
         const { type, data } = JSON.parse(e.data);
- 
+
         if (type == "log") {
           const lines = data.split(/\r?\n/).flat();
           setLogs((values: string[]) => [...values, ...lines]);
@@ -49,6 +49,10 @@ function Container() {
     window.onbeforeunload = () => {
       ws.onclose = function () {}; // disable onclose handler first
       ws.close();
+    };
+
+    const sendCommand = (command: string) => {
+      ws.send(JSON.stringify({ type: "command", message: command }));
     };
 
     const interval = setInterval(getContainers, 1000);
