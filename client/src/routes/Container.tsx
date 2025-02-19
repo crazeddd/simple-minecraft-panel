@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Line } from 'react-chartjs-2';
 import { handleContainers } from "../utils/handleContainers";
 
 import Nav from "../components/Nav";
 import NavTop from "../components/NavTop";
 import Footer from "../components/Footer";
-import Graph from "../components/Graph";
 
 import Icons from "../../public/assets/Icons";
 
@@ -13,7 +13,7 @@ function Container() {
   const { containers, getContainers, changeState } = handleContainers();
   const [container, setContainer] = useState({});
   const [logs, setLogs] = useState([]);
-  const [stats, setStats] = useState({});
+  const [stats, setStats] = useState();
 
   const { id } = useParams();
 
@@ -28,7 +28,7 @@ function Container() {
     ); //GITSPACES: wss://glorious-cod-6wj4pj674992j55-2401.app.github.dev
 
     ws.onopen = () => {
-      console.log(`Connected to container ws`);
+      console.log(`Connected to ${id}`);
       ws.send(JSON.stringify({ type: "connect", message: id }));
 
       ws.onmessage = (e) => {
@@ -38,7 +38,9 @@ function Container() {
           const lines = data.split(/\r?\n/).flat();
           setLogs((values: string[]) => [...values, ...lines]);
         }
-        if (type == "stats") setStats(data);
+        if (type == "stats") {
+          setStats(data);
+        }
       };
 
       ws.onclose = () => {
@@ -100,7 +102,7 @@ function Container() {
                   </button>
 
                   <div className="center">
-                    <h5>{container.Names}</h5>
+                    <h5>{container.Name}</h5>
                     <small className="muted">{container.Image}</small>
                   </div>
                 </div>
@@ -115,12 +117,12 @@ function Container() {
                   <p>&gt;</p>
                   <input></input>
                 </div>
-                {!!stats.length ? (
+                {stats ? (
                   <p>
-                    {Math.round((stats.memory_stats.usage / 1e9) * 100) / 100}Gb
-                    / {Math.round((stats.memory_stats.limit / 1e9) * 100) / 100}
-                    Gb
-                  </p>
+                  {Math.round((stats.memory_stats.usage / 1e9) * 100) / 100}Gb
+                  / {Math.round((stats.memory_stats.limit / 1e9) * 100) / 100}
+                  Gb
+                </p>
                 ) : (
                   <p>Loading...</p>
                 )}

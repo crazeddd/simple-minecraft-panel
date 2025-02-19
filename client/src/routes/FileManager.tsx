@@ -7,7 +7,7 @@ import Nav from "../components/Nav";
 import NavTop from "../components/NavTop";
 import Footer from "../components/Footer";
 
-var path: string = "";
+var path: string = "/data";
 
 function Files() {
   const { files, readDir, readFile } = handleFiles();
@@ -28,7 +28,7 @@ function Files() {
   };
 
   useEffect(() => {
-    readDir("/.");
+    readDir(path);
   }, []);
 
   return (

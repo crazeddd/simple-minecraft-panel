@@ -1,13 +1,12 @@
 import type { Request, Response } from "express";
 import Docker from "dockerode";
 import Container from "../db/containerModel";
-import { userInfo } from "os";
 
 var docker = new Docker();
 
 export const stopContainer = async (req: Request, res: Response) => {
-  let { id } = req.body;
-  let container = docker.getContainer(id);
+  const { id } = req.body;
+  const container = docker.getContainer(id);
   container.stop((error: string) => {
     if (error) {
       res.status(500).json(`Failed to stop container ${id}`);
@@ -20,8 +19,8 @@ export const stopContainer = async (req: Request, res: Response) => {
 };
 
 export const startContainer = async (req: Request, res: Response) => {
-  let { id } = req.body;
-  let container = docker.getContainer(id);
+  const { id } = req.body;
+  const container = docker.getContainer(id);
   container.start((error: string) => {
     if (error) {
       res.status(500).json(`Failed to start container ${id}`);
@@ -35,73 +34,106 @@ export const startContainer = async (req: Request, res: Response) => {
 
 //General data for containers that doesnt need to be polled (ex. Name, Id)
 export const getContainers = async (req: Request, res: Response) => {
-  let containers: any[] = [];
+  const userId = req.body.token.userId;
+  const containers: any[] = [];
   try {
-    const containerList = await docker.listContainers({ all: true });
+    const userContainerList = await Container.find({ owner_id: userId });
 
-    for (const containerInfo of containerList) {
-      let container = {
-        Id: containerInfo.Id,
-        Image: containerInfo.Image,
-        Names: containerInfo.Names,
-        State: containerInfo.State,
-      };
+    const containerPromises = userContainerList.map(async (userContainer) => {
+      try {
+        const container = docker.getContainer(userContainer.id);
+        const containerInfo = await container.inspect();
+        return {
+          Id: containerInfo.Id,
+          Image: containerInfo.Image,
+          Name: containerInfo.Name,
+          State: containerInfo.State.Status,
+        };
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error(error);
+        }
+      }
+    });
+    const resolvedContainers = await Promise.all(containerPromises);
+    containers.push(...resolvedContainers);
 
-      containers.push(container);
-    }
     res.status(200).send(JSON.stringify(containers));
-  } catch (err) {
-    res.status(500).send(`Error getting containers}`);
-    console.error("Error processing container:", err);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).send("Failed to fetch containers");
+      console.error("Error retrieving containers:", error);
+    }
   }
 };
 
 export const createContainer = async (req: Request, res: Response) => {
+  const data = req.body;
+
   try {
-    for (let input in req.body) {
-      if (input == null) {
+    for (let input in data) {
+      if (!input) {
         throw new Error("Please fill out all the inputs");
       }
     }
 
+    const findUnallocatedPort = async () => {
+      const rangeMax = 20000;
+      const rangeMin = 10000;
+      const intervalAmount = 10000;
+
+      const docCount = await Container.countDocuments();
+
+      for (let i = 0; i < intervalAmount; i++) {
+        const port: number = Math.floor(Math.random() * rangeMax) + rangeMin;
+        for (let i = -1; i < docCount; i++) {
+          const res = await Container.exists({ port: port });
+          if (!res) return port;
+        }
+      }
+    };
+
+    const port = await findUnallocatedPort();
+
     const containerConfig = {
-      Image: req.body.image,
-      name: req.body.name,
+      Image: "itzg/minecraft-server",
+      name: data.name,
+      tty: true,
+      stdin: true,
       ExposedPorts: {
-        [`${req.body.port}/${req.body.protocol}`]: {},
+        [`${port}/tcp`]: {},
       },
       HostConfig: {
         PortBindings: {
-          [`${req.body.port}/${req.body.protocol}`]: [
-            { HostPort: req.body.host_port },
-          ],
+          [`${port}/tcp`]: [{ HostPort: port?.toString() }],
         },
       },
-      Env: [`VERSION=${req.body.version}`, req.body.env],
+      Env: [
+        `VERSION=${data.version}`,
+        `MEMORY=${data.max_ram}G`,
+        `TYPE=${data.type}`,
+        "EULA=TRUE",
+      ],
     };
 
     console.log(containerConfig);
 
-    docker.createContainer(
-      containerConfig,
-      async (error: string, container: any) => {
-        if (error) {
-          throw new Error(`Failed to create container ${error}`);
-        }
+    const container = await docker.createContainer(containerConfig);
 
-        const newContainer = new Container({
-          owner_id: req.body.token.userId,
-          id: container.id,
-        });
+    const newContainer = new Container({
+      owner_id: data.token.userId,
+      id: container.id,
+      port: port,
+      max_ram: data.max_ram,
+      max_cpu: data.max_cpu,
+    });
 
-        await newContainer.save();
-      }
-    );
+    await newContainer.save();
 
-    res.status(200).send(`Created new container ${req.body.name}`);
+    res.status(200).json(`Created new container ${req.body.name}`);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(500).send(error.message);
+      res.status(500).json(error.message);
       console.error(error.message);
     }
   }

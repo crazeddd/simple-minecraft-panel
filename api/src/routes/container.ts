@@ -13,8 +13,8 @@ router.post("/stop", stopContainer); //Stops container
 
 router.post("/start", startContainer); //Starts container
 
-router.get("/get-containers", getContainers); //Gets all containers basic metadata
+router.get("/get-containers", auth, getContainers); //Gets all containers basic metadata
 
-router.post("/build-container", auth, createContainer); //Builds new container
+router.post("/create-container", auth, createContainer); //Builds new container
 
 export default router;

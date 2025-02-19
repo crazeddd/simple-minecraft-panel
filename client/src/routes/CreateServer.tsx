@@ -14,24 +14,24 @@ function CreateServer() {
   const sumbitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let url = `${apiHost}/docker/build-container`;
-    fetch(url, {
+    const url = `${apiHost}/container/create-container`;
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(form),
-    })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
-      .then((obj) => {
-        console.log(obj.body);
-        if (obj.status <= 200) {
-          navigate("/");
-        }
-      });
-    console.log(form);
+    });
+
+    const data = res.json();
+    console.log(data);
+
+    if (res.ok) {
+      navigate("/");
+    }
   };
 
   return (
@@ -42,7 +42,7 @@ function CreateServer() {
         <form className="widget secondary column" onSubmit={sumbitForm}>
           <h5>New Server</h5>
           <br />
-          <div className="row">
+          <div className="row gp-2">
             <input
               placeholder="Name"
               name="name"
@@ -70,23 +70,25 @@ function CreateServer() {
               <option value="1.18.1"></option>
               <option value="1.16.5"></option>
             </datalist>
-            <img className="server-icon" src="e.png"></img>
             <input
-              placeholder="Platform"
-              name="platform"
-              value={form.platform || ""}
+              placeholder="Type"
+              name="type"
+              value={form.type || ""}
+              onChange={handleChange}
+            />
+          </div>
+          <br />
+          <div className="row gp-2">
+            <input
+              placeholder="Max Ram"
+              name="max_ram"
+              value={form.max_ram || ""}
               onChange={handleChange}
             />
             <input
-              placeholder="Host Port"
-              name="host_port"
-              value={form.host_port || ""}
-              onChange={handleChange}
-            />
-            <input
-              placeholder="Protocol"
-              name="protocol"
-              value={form.protocol || ""}
+              placeholder="Max Cpu (ex. 1, 1.5)"
+              name="max_cpu"
+              value={form.max_cpu || ""}
               onChange={handleChange}
             />
           </div>

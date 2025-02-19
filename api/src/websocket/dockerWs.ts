@@ -14,16 +14,17 @@ dockerWss.on("connection", (ws) => {
       const data = JSON.parse(e.toString());
 
       if (data.type === "connect") {
-        const container = docker.getContainer(data.message);
+        if (data.auth) {
 
-        console.log(container);
+        }
+        const container = docker.getContainer(data.message);
 
         const containerStream = await container.attach({
           stream: true,
-          hijack: true,
           stdout: true,
-          stdin: true,
-          stderr: true,
+          //hijack: true,
+          //stdin: true,
+          //stderr: true,
           logs: true,
         });
 
@@ -43,7 +44,7 @@ dockerWss.on("connection", (ws) => {
             }
           } catch (error) {
             console.error("Read loop error:", error);
-            containerStream.end();
+            if (containerStream instanceof ReadableStream) containerStream.end();
             containerStreams.delete(ws);
             clearInterval(statsPoll);
             ws.send(

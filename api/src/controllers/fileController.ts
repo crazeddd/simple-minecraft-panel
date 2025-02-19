@@ -4,7 +4,7 @@ import fsInit from "fs";
 
 const fs = fsInit.promises;
 
-var root = ".";
+var root = "/workspaces/mc-panel/test_containers";
 
 export const readDirectory = async (req: Request, res: Response) => {
   let { path } = req.body;

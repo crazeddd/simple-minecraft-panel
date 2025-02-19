@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 export interface ContainerSchema extends mongoose.Schema {
   owner_id: string;
   id: string;
-  password: string;
+  port: number;
+  max_ram: number;
+  max_cpu: number;
 }
 
 const ContainerSchema = new mongoose.Schema<ContainerSchema>({
@@ -14,6 +16,21 @@ const ContainerSchema = new mongoose.Schema<ContainerSchema>({
   },
   id: {
     type: String,
+    required: true,
+    unique: false,
+  },
+  port: {
+    type: Number,
+    required: true,
+    unique: false,
+  },
+  max_ram: {
+    type: Number,
+    required: true,
+    unique: false,
+  },
+  max_cpu: {
+    type: Number,
     required: true,
     unique: false,
   },

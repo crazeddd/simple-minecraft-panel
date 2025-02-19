@@ -6,6 +6,7 @@ const handleContainers = () => {
   const [containers, setContainers] = useState([]);
 
   const getContainers = async () => {
+    const token = localStorage.getItem("token");
     const url = `${apiHost}/container/get-containers`;
 
     try {
@@ -13,28 +14,33 @@ const handleContainers = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await (await res).json();
       setContainers(data);
-    } catch (err) {
-      console.error("Error:", err);
+    } catch (error) {
+      console.error("Failed to get containers:", error);
     }
   };
 
-  const updateContainers = (type: string, id: any) => {
-    let url = `${apiHost}/container/${type}`;
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id }),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.error("Error:", err));
+  const updateContainers = async (type: string, id: string) => {
+    const url = `${apiHost}/container/${type}`;
+
+    try {
+      const res = fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+      const data = await (await res).json();
+      console.log(data);
+    } catch (error: unknown) {
+      console.error("Failed to update container state");
+    }
   };
 
   const changeState = async (self: any, state: string) => {

@@ -144,6 +144,7 @@ input {
   padding: 1rem;
   border-radius: 0.5rem;
   background-color: var(--secondary);
+  width: 100%;
   /*flex-grow: 1;*/
 }
 
@@ -217,6 +218,9 @@ img.server-icon {
 
 .server {
   justify-content: space-between;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .widget {
