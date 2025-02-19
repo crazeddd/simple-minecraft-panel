@@ -31,8 +31,6 @@ export default function Containers() {
     </svg>
   );
 
-  console.log(containers);
-
   return (
     <div className="servers column gp-1">
       {!!containers.length ? (
@@ -67,7 +65,7 @@ export default function Containers() {
       ) : (
         <div className="server widget secondary row">
           <p className="muted">
-            Its looking a bit empty in here, why not create a server?
+            Its looking a bit empty in here, why not create a container?
           </p>
         </div>
       )}

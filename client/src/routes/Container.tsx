@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Line } from 'react-chartjs-2';
+import Chart from "chart.js/auto";
+import { CategoryScale } from "chart.js";
+Chart.register(CategoryScale);
+import { Line } from "react-chartjs-2";
 import { handleContainers } from "../utils/handleContainers";
 
 import Nav from "../components/Nav";
@@ -13,7 +16,7 @@ function Container() {
   const { containers, getContainers, changeState } = handleContainers();
   const [container, setContainer] = useState({});
   const [logs, setLogs] = useState([]);
-  const [stats, setStats] = useState();
+  const [chartData, setChartData] = useState();
 
   const { id } = useParams();
 
@@ -39,7 +42,19 @@ function Container() {
           setLogs((values: string[]) => [...values, ...lines]);
         }
         if (type == "stats") {
-          setStats(data);
+          setChartData({
+            labels: [...Date.now()],
+            datasets: [
+              {
+                label: "RAM",
+                backgroundColor: "rgb(255, 99, 132)",
+                borderColor: "rgb(255, 99, 132)",
+                data: [
+                  ...(Math.round((data.memory_stats.usage / 1e9) * 100) / 100),
+                ],
+              },
+            ],
+          });
         }
       };
 
@@ -117,13 +132,14 @@ function Container() {
                   <p>&gt;</p>
                   <input></input>
                 </div>
-                {stats ? (
-                  <p>
+                {chartData ? (
+                  <Line data={chartData} />
+                ) : (
+                  /*<p>
                   {Math.round((stats.memory_stats.usage / 1e9) * 100) / 100}Gb
                   / {Math.round((stats.memory_stats.limit / 1e9) * 100) / 100}
                   Gb
-                </p>
-                ) : (
+                </p>*/
                   <p>Loading...</p>
                 )}
               </div>

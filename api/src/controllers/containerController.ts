@@ -4,6 +4,13 @@ import Container from "../db/containerModel";
 
 var docker = new Docker();
 
+const getServerIp = async () => {
+  const res = await fetch("https://ipinfo.io/ip", { method: "GET" });
+  return (await res.blob()).text();
+};
+
+const serverIp = await getServerIp();
+
 export const stopContainer = async (req: Request, res: Response) => {
   const { id } = req.body;
   const container = docker.getContainer(id);
@@ -45,7 +52,7 @@ export const getContainers = async (req: Request, res: Response) => {
         const containerInfo = await container.inspect();
         return {
           Id: containerInfo.Id,
-          Image: containerInfo.Image,
+          Image: `${serverIp}:443`,
           Name: containerInfo.Name,
           State: containerInfo.State.Status,
         };

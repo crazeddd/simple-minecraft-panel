@@ -1,4 +1,4 @@
-FROM node:18
+FROM oven/bun:canary-alpine
 
 ADD api .
 
@@ -6,14 +6,14 @@ ADD client .
 
 RUN <<EOF
 cd api 
-npm install
-npm start
+bun i
+bun build
 EOF
 
 RUN <<EOF
 cd client 
-npm install
-npm start
+bun i
+bun build
 EOF
 
 #WIP
