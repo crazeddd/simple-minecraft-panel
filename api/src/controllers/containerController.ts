@@ -52,7 +52,7 @@ export const getContainers = async (req: Request, res: Response) => {
         const containerInfo = await container.inspect();
         return {
           Id: containerInfo.Id,
-          Image: `${serverIp}:443`,
+          Image: `${serverIp}:${userContainer.port}`,
           Name: containerInfo.Name,
           State: containerInfo.State.Status,
         };

@@ -336,6 +336,12 @@ glob {
   flex-grow: 1;
 }
 
+/*Container Page Stuff (move in future)*/
+.stat-displays {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 /*Tooltips*/
 .tooltip {
   position: relative;
@@ -393,6 +399,7 @@ glob {
   border-radius: 0.5rem 0.5rem 0rem 0rem;
   scrollbar-color: var(--secondary) var(--background_dark);
   scrollbar-width: 1rem;
+  overflow-anchor: none;
 }
 
 #console-input {

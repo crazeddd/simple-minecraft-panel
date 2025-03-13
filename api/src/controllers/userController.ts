@@ -66,13 +66,15 @@ export const createAccount = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   try {
-    let user = await User.findOne({ username: username });
+    const user = await User.findOne({ username: username });
     if (!user) {
-      throw new Error("Account does not exist");
+      res.status(404).json({ message: "Account does not exist" });
     }
-    await bcrypt.compare(password, user.password).catch((error: any) => {
-      throw new Error("Incorrect password");
-    });
+    const validPass = await bcrypt.compare(password, user.password);
+
+    if (!validPass) {
+      res.status(401).json({ message: "Invalid password" });
+    }
 
     const token: {} = jwt.sign(
       {
@@ -86,17 +88,17 @@ export const login = async (req: Request, res: Response) => {
       }
     );
 
-    res.status(200).send({
+    res.status(200).json({
       message: "Succesfully logged in",
       token,
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(500).send({
+      res.status(500).json({
         message: error.message,
       });
       console.error(error.message);
     }
-    console.error("An unknown error has occured")
+    console.error("An unknown error has occured");
   }
 };

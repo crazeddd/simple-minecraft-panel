@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 Chart.register(CategoryScale);
 import { Line } from "react-chartjs-2";
+
 import { handleContainers } from "../utils/handleContainers";
 
 import Nav from "../components/Nav";
@@ -12,13 +14,39 @@ import Footer from "../components/Footer";
 
 import Icons from "../../public/assets/Icons";
 
+var cpuUsage: string[] = [];
+var ramUsage: number[] = [];
+var iter: string[] = [];
+var i = "";
+
 function Container() {
   const { containers, getContainers, changeState } = handleContainers();
   const [container, setContainer] = useState({});
   const [logs, setLogs] = useState([]);
-  const [chartData, setChartData] = useState();
+  const [ramChartData, setRAMChartData] = useState();
+  const [cpuChartData, setCPUChartData] = useState();
 
   const { id } = useParams();
+
+  const ramChartOptions = {
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 2.5,
+        min: 0,
+      },
+    },
+  };
+
+  const cpuChartOptions = {
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        min: 0,
+      },
+    },
+  };
 
   // Svg Icons
   const { play, pause } = Icons();
@@ -41,17 +69,54 @@ function Container() {
           const lines = data.split(/\r?\n/).flat();
           setLogs((values: string[]) => [...values, ...lines]);
         }
+
         if (type == "stats") {
-          setChartData({
-            labels: [...Date.now()],
+          if (iter.length > 25) {
+            iter.shift();
+            ramUsage.shift();
+            cpuUsage.shift();
+          }
+          iter.push(i);
+
+          ramUsage.push(
+            Math.round((data.memory_stats.usage / 1e9) * 100) / 100
+          );
+
+          setRAMChartData({
+            labels: iter,
             datasets: [
               {
-                label: "RAM",
-                backgroundColor: "rgb(255, 99, 132)",
+                label: "RAM (Gb)",
+                backgroundColor: "rgba(255, 99, 133, 0.26)",
                 borderColor: "rgb(255, 99, 132)",
-                data: [
-                  ...(Math.round((data.memory_stats.usage / 1e9) * 100) / 100),
-                ],
+                fill: true,
+                data: ramUsage,
+              },
+            ],
+          });
+
+          const cpuDelta =
+            data.cpu_stats.cpu_usage.total_usage -
+            data.precpu_stats.cpu_usage.total_usage;
+          const systemDelta =
+            data.cpu_stats.system_cpu_usage -
+            data.precpu_stats.system_cpu_usage;
+          const numCpus =
+            data.cpu_stats.online_cpus ||
+            data.cpu_stats.cpu_usage.percpu_usage.length;
+
+          const cpuPercentage = (cpuDelta / systemDelta) * numCpus * 100;
+          cpuUsage.push(cpuPercentage.toFixed(2));
+
+          setCPUChartData({
+            labels: iter,
+            datasets: [
+              {
+                label: "CPU (%)",
+                backgroundColor: "rgba(99, 255, 154, 0.26)",
+                borderColor: "rgb(99, 255, 146)",
+                fill: true,
+                data: cpuUsage,
               },
             ],
           });
@@ -99,7 +164,7 @@ function Container() {
                   <a className="muted" href={`${container.Id}/files`}>
                     Files
                   </a>
-                  <a className="muted">Mods/Plugins</a>
+                  <a className="muted">Mods</a>
                 </div>
                 <hr></hr>
                 <div className="row gp-1">
@@ -132,16 +197,18 @@ function Container() {
                   <p>&gt;</p>
                   <input></input>
                 </div>
-                {chartData ? (
-                  <Line data={chartData} />
-                ) : (
-                  /*<p>
-                  {Math.round((stats.memory_stats.usage / 1e9) * 100) / 100}Gb
-                  / {Math.round((stats.memory_stats.limit / 1e9) * 100) / 100}
-                  Gb
-                </p>*/
-                  <p>Loading...</p>
-                )}
+                <div>
+                  {ramChartData ? (
+                    <Line data={ramChartData} options={ramChartOptions} />
+                  ) : (
+                    <p>Loading...</p>
+                  )}
+                  {cpuChartData ? (
+                    <Line data={cpuChartData} options={cpuChartOptions} />
+                  ) : (
+                    <p>Loading...</p>
+                  )}
+                </div>
               </div>
             ) : (
               <p>Loading...</p>

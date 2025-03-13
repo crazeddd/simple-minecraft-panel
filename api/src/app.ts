@@ -21,7 +21,6 @@ const corsConfig = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 };
 
-/* EXPRESS UTILS */
 app.use(cors(corsConfig));
 app.options("*", cors(corsConfig));
 app.use(logger("dev"));
